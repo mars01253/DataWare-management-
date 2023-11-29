@@ -31,8 +31,7 @@ if (!isset($_SESSION['id'])) {
           <div class="hidden sm:block sm:ml-6">
             <div class="flex space-x-4 ml-50 ">
               <form action="memberdash.php" method="post" class="flex w-[100%]">
-                <input type="submit" value="My Teams" name="projects" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                <input type="submit" value="My Projects" name="teams" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
+                <input type="submit" value="My Teams" name="teams" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                 <input type="submit" value="Stats" name="stats" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
                 <a href="logout.php" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">Log out</a>
               </form>
@@ -47,7 +46,6 @@ if (!isset($_SESSION['id'])) {
     </div>
     <div class="sm:hidden" id="mobile-menu">
       <div class="px-2 pt-2 pb-3 space-y-1">
-        <input type="submit" value="My Projects" name="projects" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium">
         <input type="submit" value="My Teams" name="teams" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
         <input type="submit" value="Stats" name="stats" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
         <input type="submit" value="Log Out" name="logout" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
@@ -60,7 +58,7 @@ if (!isset($_SESSION['id'])) {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
       <div class="flex-shrink-0">
-        <img class="h-10 w-10 rounded-full" src="" alt="">
+        <img class="h-10 w-10 rounded-full" src="employee.png" alt="">
       </div>
       <div class="flex-1 min-w-0">
         <a href="#" class="focus:outline-none">
@@ -79,48 +77,58 @@ if (!isset($_SESSION['id'])) {
       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="px-4 py-3">
-            <?php if (isset($_POST['projects'])) {
-              echo "my teams";
-            } elseif (isset($_POST['teams'])) {
+            <?php
+            $choice = 'teams';
+            if (isset($_POST['teams']) || $choice === 'teams') {
               echo "my Projects";
+              $choice = 'teams';
             } ?>
           </th>
           <th scope="col" class="px-4 py-3">
-            <?php if (isset($_POST['projects'])) {
-              echo "team status";
-            } elseif (isset($_POST['teams'])) {
+            <?php if (isset($_POST['teams']) || $choice === 'teams') {
               echo "Project status";
             } ?>
           </th>
           <th scope="col" class="px-4 py-3">
-            <?php if (isset($_POST['projects'])) {
-              echo "Project Name";
-            } elseif (isset($_POST['teams'])) {
+            <?php if (isset($_POST['teams']) || $choice === 'teams') {
               echo "Team Name";
             } ?>
-          </th>
-          <th scope="col" class="px-4 py-3">
-            Scrum Master
           </th>
         </tr>
 
       </thead>
       <tbody>
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
-          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+        <?php
+        $id = $_SESSION['id'];
 
-          </th>
-          <td class="px-4 py-4">
+        if ($choice === 'teams') {
+          $sql = "SELECT users.equipe_id, users.project_id, projects.project_status, projects.project_name, equipe.equipe_name
+               FROM users
+               INNER JOIN projects ON users.project_id = projects.project_id 
+               INNER JOIN equipe ON users.equipe_id = equipe.equipe_id
+               WHERE user_id = ?";
 
-          </td>
-          <td class="px-4 py-4">
+          $stmt = mysqli_prepare($conn, $sql);
 
-          </td>
-          <td class="px-4 py-4">
+          if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "i", $id);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $equipe_id, $project_id, $project_status, $project_name, $equipe_name);
 
-          </td>
-        </tr>
-        </tr>
+            while (mysqli_stmt_fetch($stmt)) {
+              echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                   <td class='px-6 py-4'>$project_name</td>
+                   <td class='px-4 py-4'>$project_status</td>
+                   <td class='px-4 py-4'>$equipe_name</td>
+                 </tr>";
+            }
+
+            mysqli_stmt_close($stmt);
+          } else {
+            echo "Error in the SQL query: " . mysqli_error($conn);
+          }
+        }
+        ?>
       </tbody>
     </table>
   </div>

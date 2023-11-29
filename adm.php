@@ -24,11 +24,10 @@ if (!isset($_SESSION['id'])) {
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center w-[100%] justify-between">
-          <div class="flex-shrink-0">
-            <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-            <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+          <div class="w-[10%]">
+            <img class="block lg:block " src="img/White and Black Elegant System Logo.png" alt="Workflow">
           </div>
-          <div class="hidden sm:block sm:ml-6">
+          <div class="flex flex-col sm:block sm:ml-6">
             <div class="flex space-x-4 ml-50 ">
               <form action="adm.php" method="post" class="flex w-[100%]">
                 <input type="submit" value="Members" name="members" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
@@ -44,21 +43,14 @@ if (!isset($_SESSION['id'])) {
     </div>
     </div>
     </div>
-    <div class="sm:hidden" id="mobile-menu">
-      <div class="px-2 pt-2 pb-3 space-y-1">
-        <input type="submit" value="Members" name="members" class="bg-gray-900 text-white block px-3 py-2 rounded-md text-base font-medium">
-        <input type="submit" value="Stats" name="stats" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-        <input type="submit" value="Log Out" name="logout" class="text-gray-300 hover:bg-gray-700 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
-      </div>
-    </div>
     </div>
   </nav>
 
   <h1 class="text-xl mt-10 ml-5">Welcome Back</h1>
-  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+  <div class="w-[100%]">
     <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
       <div class="flex-shrink-0">
-        <img class="h-10 w-10 rounded-full" src="" alt="">
+        <img class="h-10 w-10 rounded-full" src="eo.jpg" alt="..">
       </div>
       <div class="flex-1 min-w-0">
         <a href="#" class="focus:outline-none">
@@ -75,14 +67,14 @@ if (!isset($_SESSION['id'])) {
   <div class="relative  shadow-md sm:rounded-lg">
   <table>
     <thead>
-        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <tr class="bg-white border-b text-base dark:bg-gray-800 dark:border-gray-700">
             <th scope="col" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">MEMBERS</th>
             <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Role</th>
             <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Member Status</th>
             <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Assign as Product Owner</th>
         </tr>
     </thead>
-    <tbody>
+    <tbody class="ml-3 w-[80%]">
         <?php
         $sql = 'SELECT user_id, user_fullname, user_role, status FROM users WHERE user_role!="admin"';
         $stmt = mysqli_prepare($conn, $sql);

@@ -105,7 +105,6 @@ if (!isset($_SESSION['id'])) {
           $stmt3 = mysqli_prepare($conn, $sql3);
           mysqli_stmt_bind_param($stmt3, "iii", $lastInsertedId, $selected_project_id, $scrmid);
           $result3 = mysqli_stmt_execute($stmt3);
-
           if ($result2 && $result3) {
             mysqli_commit($conn);
             echo 'Team added successfully';
@@ -172,9 +171,12 @@ if (!isset($_SESSION['id'])) {
       <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
         <tr>
           <th scope="col" class="px-4 py-3">
-            <?php if (isset($_POST['projects'])) {
+            <?php $choice = 'project';
+            if (isset($_POST['projects'])) {
+              $choice = 'project';
               echo " teams";
             } elseif (isset($_POST['members'])) {
+              $choice = 'member';
               echo "Members";
             } ?>
           </th>
@@ -196,17 +198,21 @@ if (!isset($_SESSION['id'])) {
       </thead>
       <tbody>
         <?php
-        $sql = "SELECT equipe_id, equipe_name, equipe_status, projects.project_id FROM equipe
-        INNER JOIN projects ON equipe.project_id = projects.project_id WHERE scrum_master_id=?";
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
-          $_SESSION['type'] = 'scrummaster';
-          mysqli_stmt_bind_param($stmt, "i", $scrmid);
-          mysqli_stmt_execute($stmt);
-          mysqli_stmt_bind_result($stmt, $equipe_id, $equipe_name, $equipe_status, $project_name);
+        if ($choice === 'project') {
+          $sql = "SELECT equipe.equipe_id, equipe_name, equipe_status, equipe.project_id, projects.project_name
+        FROM equipe
+        INNER JOIN projects ON equipe.project_id = projects.project_id 
+        WHERE equipe.scrum_master_id = ?";
+          $stmt = mysqli_prepare($conn, $sql);
 
-          while (mysqli_stmt_fetch($stmt)) {
-            echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+          if ($stmt) {
+            $_SESSION['type'] = 'scrummaster';
+            mysqli_stmt_bind_param($stmt, "i", $scrmid);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $equipe_id, $equipe_name, $equipe_status, $project_id, $project_name);
+
+            while (mysqli_stmt_fetch($stmt)) {
+              echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
                 <td class='px-6 py-4'>$equipe_name</td>
                 <td class='px-4 py-4'>$equipe_status</td>
                 <td class='px-4 py-4'>$project_name</td>
@@ -216,15 +222,46 @@ if (!isset($_SESSION['id'])) {
                 <td class='px-2 py-4'>
                     <a href='delete.php?id=$equipe_id'>Delete</a>
                 </td>
-            </tr>";
-          }
+              </tr>";
+            }
 
-          $_SESSION['id'] = $scrmid;
-          mysqli_stmt_close($stmt);
-        } else {
-          echo "Error in the SQL query: " . mysqli_error($conn);
+            $_SESSION['id'] = $scrmid;
+            $_SESSION['idequipe'] = $equipe_id;
+            mysqli_stmt_close($stmt);
+          } else {
+            echo "Error in the SQL query: " . mysqli_error($conn);
+          }
+        }
+        if ($choice === 'member') {
+          $sql = "SELECT users.user_id, users.user_fullname, users.status, equipe.equipe_name
+                  FROM users
+                  LEFT JOIN equipe ON users.equipe_id = equipe.equipe_id
+                  WHERE users.user_role='member'";
+          $stmt = mysqli_prepare($conn, $sql);
+
+          if ($stmt) {
+            $_SESSION['type'] = 'member';
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_bind_result($stmt, $user_id, $user_fullname, $status, $equipe_name);
+
+            while (mysqli_stmt_fetch($stmt)) {
+              echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                              <td class='px-6 py-4'>$user_fullname</td>
+                              <td class='px-4 py-4'>$status</td>
+                              <td class='px-4 py-4'>$equipe_name</td>
+                              <td class='px-4 py-4'><a href='assign.php?iduser=$user_id'>Assign A team</a></td>
+                              <td class='px-4 py-4'><a href='delete.php?iduser=$user_id'>Remove From Teams</a></td>
+                          </tr>";
+            }
+
+            $_SESSION['id'] = $scrmid;
+            $_SESSION['userid'] = $user_id;
+
+            mysqli_stmt_close($stmt);
+          } 
         }
         ?>
+
 
 
       </tbody>

@@ -16,7 +16,7 @@ if ($_SESSION['type'] === 'productowner') {
     $managerid = $_SESSION['projectmanagerid'];
     $sql = "DELETE FROM projects WHERE project_id = $project_id ";
     mysqli_query($conn, $sql);
-    $sqluser = "UPDATE users SET user_role = 'member', status = 'not active', project_id = NULL WHERE user_id = ?";
+    $sqluser = "UPDATE users SET user_role = 'member', status = 'not active' WHERE user_id = ?";
     $stmtuser = mysqli_prepare($conn, $sqluser);
     mysqli_stmt_bind_param($stmtuser, "i", $managerid);
     mysqli_stmt_execute($stmtuser);
@@ -39,6 +39,15 @@ if ($_SESSION['type'] === 'scrummaster') {
 
     header('location:scrum.php');
 }
+if ($_SESSION['type'] === 'member') {
+    $user_id = $_SESSION['userid'];
+    $sql = "UPDATE users SET status = 'not active', project_id = NULL, equipe_id = NULL WHERE user_id = ?";
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "i", $user_id);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+    mysqli_close($conn);
+    header('location:scrum.php');
+    exit();
+}
 
-
-?>
