@@ -68,14 +68,32 @@ if (!isset($_SESSION['id'])) {
   <table>
     <thead>
         <tr class="bg-white border-b text-base dark:bg-gray-800 dark:border-gray-700">
-            <th scope="col" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">MEMBERS</th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Role</th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Member Status</th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">Assign as Product Owner</th>
+            <th scope="col" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
+            if (isset($_POST['members']) ) {
+              echo "Members";
+              $choice = 'members';
+            }if(isset($_POST['stats'])){
+              $choice = 'stats';
+            } ?></th>
+            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
+            if (isset($_POST['members']) || $choice === 'members') {
+              echo "Role";
+            } ?></th>
+            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
+            if (isset($_POST['members']) || $choice === 'members') {
+              echo "Member Status";
+
+            } ?></th>
+            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
+            if (isset($_POST['members']) || $choice === 'members') {
+              echo "Assign as Product Owner";
+
+            } ?></th>
         </tr>
     </thead>
     <tbody class="ml-3 w-[80%]">
         <?php
+        if($choice === 'members'){
         $sql = 'SELECT user_id, user_fullname, user_role, status FROM users WHERE user_role!="admin"';
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_execute($stmt);
@@ -96,7 +114,48 @@ if (!isset($_SESSION['id'])) {
         }
 
         mysqli_stmt_close($stmt);
-        ?>
+      }
+      if ($choice === 'stats') {
+        $sql = "SELECT COUNT(*) FROM users";
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_bind_result($stmt, $result);
+        mysqli_stmt_fetch($stmt);
+        mysqli_stmt_close($stmt);
+        $sql2 = "SELECT COUNT(*) FROM equipe";
+        $stmt2 = mysqli_prepare($conn, $sql2);
+        mysqli_stmt_execute($stmt2);
+        mysqli_stmt_bind_result($stmt2, $result2); 
+        mysqli_stmt_fetch($stmt2);
+        mysqli_stmt_close($stmt2);
+        $sql3 = "SELECT COUNT(*) FROM projects";
+        $stmt3 = mysqli_prepare($conn, $sql3);
+        mysqli_stmt_execute($stmt3);
+        mysqli_stmt_bind_result($stmt3, $result3);
+        mysqli_stmt_fetch($stmt3);
+        mysqli_stmt_close($stmt3);
+        echo "<div>
+                <h3 class='text-lg leading-6 font-medium text-gray-900'>Last 30 days</h3>
+                <dl class='mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3'>
+                    <div class='px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6'>
+                        <dt class='text-sm font-medium text-gray-500 truncate'>Total Members</dt>
+                        <dd class='mt-1 text-3xl font-semibold text-gray-900'>$result</dd>
+                    </div>
+    
+                    <div class='px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6'>
+                        <dt class='text-sm font-medium text-gray-500 truncate'>Total Teams</dt>
+                        <dd class='mt-1 text-3xl font-semibold text-gray-900'>$result2</dd>
+                    </div>
+    
+                    <div class='px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6'>
+                        <dt class='text-sm font-medium text-gray-500 truncate'>Total Projects</dt>
+                        <dd class='mt-1 text-3xl font-semibold text-gray-900'>$result3</dd>
+                    </div>
+                </dl>
+            </div>";
+    }
+?>    
+      
     </tbody>
 </table>
   </div>

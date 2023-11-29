@@ -101,7 +101,7 @@ if (!isset($_SESSION['id'])) {
           mysqli_stmt_bind_param($stmt2, "ii", $lastInsertedId, $scrmid);
           $result2 = mysqli_stmt_execute($stmt2);
 
-          $sql3 = "UPDATE users SET equipe_id = ?, status = 'active', user_role = 'scrum master', project_id = ? WHERE user_id = ?";
+          $sql3 = "UPDATE users SET equipe_id = ?, user_status = 'active', user_role = 'scrum master', project_id = ? WHERE user_id = ?";
           $stmt3 = mysqli_prepare($conn, $sql3);
           mysqli_stmt_bind_param($stmt3, "iii", $lastInsertedId, $selected_project_id, $scrmid);
           $result3 = mysqli_stmt_execute($stmt3);
@@ -134,7 +134,7 @@ if (!isset($_SESSION['id'])) {
   <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
     <div class="relative rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm flex items-center space-x-3 hover:border-gray-400 focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
       <div class="flex-shrink-0">
-        <img class="h-10 w-10 rounded-full" src="" alt="">
+        <img class="h-10 w-10 rounded-full" src="employee.png" alt="">
       </div>
       <div class="flex-1 min-w-0">
         <a href="#" class="focus:outline-none">
@@ -225,6 +225,7 @@ if (!isset($_SESSION['id'])) {
               </tr>";
             }
 
+
             $_SESSION['id'] = $scrmid;
             $_SESSION['idequipe'] = $equipe_id;
             mysqli_stmt_close($stmt);
@@ -233,35 +234,31 @@ if (!isset($_SESSION['id'])) {
           }
         }
         if ($choice === 'member') {
-          $sql = "SELECT users.user_id, users.user_fullname, users.status, equipe.equipe_name
+          $sql = "SELECT users.user_id, users.user_fullname, users.user_status, equipe.equipe_name
                   FROM users
                   LEFT JOIN equipe ON users.equipe_id = equipe.equipe_id
                   WHERE users.user_role='member'";
           $stmt = mysqli_prepare($conn, $sql);
 
           if ($stmt) {
+            $_SESSION['id'] = $scrmid;
             $_SESSION['type'] = 'member';
             mysqli_stmt_execute($stmt);
             mysqli_stmt_bind_result($stmt, $user_id, $user_fullname, $status, $equipe_name);
 
             while (mysqli_stmt_fetch($stmt)) {
               echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                              <td class='px-6 py-4'>$user_fullname</td>
-                              <td class='px-4 py-4'>$status</td>
-                              <td class='px-4 py-4'>$equipe_name</td>
-                              <td class='px-4 py-4'><a href='assign.php?iduser=$user_id'>Assign A team</a></td>
-                              <td class='px-4 py-4'><a href='delete.php?iduser=$user_id'>Remove From Teams</a></td>
-                          </tr>";
+                                <td class='px-6 py-4'>$user_fullname</td>
+                                <td class='px-4 py-4'>$status</td>
+                                <td class='px-4 py-4'>$equipe_name</td>
+                                <td class='px-4 py-4'><a href='assign.php?iduser=$user_id'>Assign A team</a></td>
+                                <td class='px-4 py-4'><a href='delete.php?iduser=$user_id'>Remove From Teams</a></td>
+                            </tr>";
             }
-
-            $_SESSION['id'] = $scrmid;
-            $_SESSION['userid'] = $user_id;
-
             mysqli_stmt_close($stmt);
-          } 
+          }
         }
         ?>
-
 
 
       </tbody>

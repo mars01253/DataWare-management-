@@ -27,7 +27,9 @@ if ($_SESSION['type'] === 'productowner') {
 }
 
 if ($_SESSION['type'] === 'scrummaster') {
-    $equipe_id = $_GET['id'];
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        $equipe_id = $_GET['id'];
+    }
     $scrumid = $_SESSION['id'];
     $sql = "DELETE FROM equipe WHERE equipe_id =$equipe_id  AND scrum_master_id = $scrumid";
     mysqli_query($conn, $sql);
@@ -40,14 +42,24 @@ if ($_SESSION['type'] === 'scrummaster') {
     header('location:scrum.php');
 }
 if ($_SESSION['type'] === 'member') {
-    $user_id = $_SESSION['userid'];
-    $sql = "UPDATE users SET status = 'not active', project_id = NULL, equipe_id = NULL WHERE user_id = ?";
+    $scrmid = $_SESSION['id'];
+
+    if ($_SERVER['REQUEST_METHOD'] == 'GET') {
+        $userid = $_GET['iduser'];
+    }
+
+    $sql = "UPDATE users SET user_status = 'not active', project_id = NULL, equipe_id = NULL WHERE user_id = ?";
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "i", $user_id);
-    mysqli_stmt_execute($stmt);
-    mysqli_stmt_close($stmt);
-    mysqli_close($conn);
-    header('location:scrum.php');
-    exit();
+
+    if ($stmt) {
+        mysqli_stmt_bind_param($stmt, "i", $userid);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+        mysqli_close($conn);
+        header('location:scrum.php');
+        exit();
+    } else {
+        echo "Error preparing statement: " . mysqli_error($conn);
+    }
 }
 

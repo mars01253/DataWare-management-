@@ -62,7 +62,7 @@ if (!isset($_SESSION['id'])) {
       <select name="managers" id="managers" class="w-[60%] rounded-xl">
         <option value="choose your project manager" disabled selected hidden>choose your project manager</option>
         <?php
-        $stmt = mysqli_prepare($conn, 'SELECT user_id , user_fullname FROM users WHERE user_role ="member" and status = "not active"');
+        $stmt = mysqli_prepare($conn, 'SELECT user_id , user_fullname FROM users WHERE user_role ="member" and user_status = "not active"');
         mysqli_stmt_execute($stmt);
         mysqli_stmt_bind_result($stmt, $user_id, $user_fullname);
         ?>
@@ -91,7 +91,7 @@ if (!isset($_SESSION['id'])) {
         if ($result) {
           $prjid = mysqli_insert_id($conn);
 
-          $updatesql = "UPDATE users SET project_id = ?, user_role = 'scrum master', status = 'active' WHERE user_id = ?";
+          $updatesql = "UPDATE users SET project_id = ?, user_role = 'scrum master', user_status = 'active' WHERE user_id = ?";
           $updatestmt = mysqli_prepare($conn, $updatesql);
           mysqli_stmt_bind_param($updatestmt, "ii", $prjid, $managerid);
           $updateresult = mysqli_stmt_execute($updatestmt);
