@@ -194,7 +194,7 @@ if (!isset($_SESSION['id'])) {
                     </td>
                 </tr>";
             }
-
+            $_SESSION['id']= $productowner;
             mysqli_stmt_close($stmt);
           }
         }

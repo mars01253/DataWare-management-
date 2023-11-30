@@ -94,7 +94,7 @@ if (!isset($_SESSION['id'])) {
     <tbody class="ml-3 w-[80%]">
         <?php
         if($choice === 'members'){
-        $sql = 'SELECT user_id, user_fullname, user_role, status FROM users WHERE user_role!="admin"';
+        $sql = 'SELECT user_id, user_fullname, user_role, user_status FROM users WHERE user_role!="admin"';
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_bind_result($stmt, $user_id,$user_fullname, $user_role,$status);
@@ -135,7 +135,7 @@ if (!isset($_SESSION['id'])) {
         mysqli_stmt_fetch($stmt3);
         mysqli_stmt_close($stmt3);
         echo "<div>
-                <h3 class='text-lg leading-6 font-medium text-gray-900'>Last 30 days</h3>
+                <h3 class='text-lg leading-6 font-medium text-gray-900'>Statistics</h3>
                 <dl class='mt-5 grid grid-cols-1 gap-5 sm:grid-cols-3'>
                     <div class='px-4 py-5 bg-white shadow rounded-lg overflow-hidden sm:p-6'>
                         <dt class='text-sm font-medium text-gray-500 truncate'>Total Members</dt>

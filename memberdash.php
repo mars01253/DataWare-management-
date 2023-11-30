@@ -91,6 +91,11 @@ if (!isset($_SESSION['id'])) {
           </th>
           <th scope="col" class="px-4 py-3">
             <?php if (isset($_POST['teams']) || $choice === 'teams') {
+              echo "Project Description";
+            } ?>
+          </th>
+          <th scope="col" class="px-4 py-3">
+            <?php if (isset($_POST['teams']) || $choice === 'teams') {
               echo "Team Name";
             } ?>
           </th>
@@ -102,7 +107,7 @@ if (!isset($_SESSION['id'])) {
         $id = $_SESSION['id'];
 
         if ($choice === 'teams') {
-          $sql = "SELECT users.equipe_id, users.project_id, projects.project_status, projects.project_name, equipe.equipe_name
+          $sql = "SELECT users.equipe_id, users.project_id, projects.project_status, projects.project_name, projects.project_description, equipe.equipe_name
                FROM users
                INNER JOIN projects ON users.project_id = projects.project_id 
                INNER JOIN equipe ON users.equipe_id = equipe.equipe_id
@@ -113,11 +118,12 @@ if (!isset($_SESSION['id'])) {
           if ($stmt) {
             mysqli_stmt_bind_param($stmt, "i", $id);
             mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $equipe_id, $project_id, $project_status, $project_name, $equipe_name);
+            mysqli_stmt_bind_result($stmt, $equipe_id, $project_id, $project_status, $projectdescription ,$project_name, $equipe_name);
 
             while (mysqli_stmt_fetch($stmt)) {
               echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
                    <td class='px-6 py-4'>$project_name</td>
+                   <td class='px-6 py-4'>$projectdescription</td>
                    <td class='px-4 py-4'>$project_status</td>
                    <td class='px-4 py-4'>$equipe_name</td>
                  </tr>";
@@ -137,8 +143,3 @@ if (!isset($_SESSION['id'])) {
 </body>
 
 </html>
-<?php
-
-
-
-?>

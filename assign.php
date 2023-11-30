@@ -10,67 +10,71 @@ if ($_SESSION['type'] === "adm") {
     mysqli_close($conn);
     header('location:adm.php');
 }
-
+?>
+<?php
 
 
 if ($_SESSION['type'] === 'productowner') {
-   
-    if (isset($_GET['idprj'])) {
-        $project_id = $_GET['idprj'];
+    $productowner = $_SESSION['id'];
+    if($_SERVER['REQUEST_METHOD']=='GET'){
+        $projectid=$_GET['idprj'];
     }
-   
-    
-    echo
-    '<form action="assign.php" method="get" class="bg-[#1f2937] relative w-[50%] px-15 py-20 z-10 rounded-xl flex flex-col items-center gap-5">
-    <input type="text" placeholder="project name" name="projectname" class="w-[60%] rounded-xl">';
-    $sql='SELECT user_id , user_fullname FROM users WHERE user_role="member" OR user_role="scrum master" ';
-    $stmt=mysqli_prepare($conn,$sql);
-    mysqli_stmt_bind_result($stmt, $userid, $username);
-    $potentialmanagers= [];
-    while (mysqli_stmt_fetch($stmt)) {
-        $potentialmanagers[$userid] = $username;
-    }
-    mysqli_stmt_close($stmt);
-    
-    echo "
-    <form action='assign.php' method='get' class='bg-[#1f2937] relative w-[50%] px-15 py-20 z-10 rounded-xl flex flex-col items-center gap-5'>
-        <select name='team' placeholder='Change the Team Name'>";
 
-    foreach ($potentialmanagers as $userid => $username) {
-        echo "<option value='$id'>$name</option>";
+    $sql = "SELECT equipe_id, equipe_name FROM equipe";
+    $stmt = mysqli_prepare($conn, $sql);
+    
+    if (!$stmt) {
+        die("Error preparing statement: " . mysqli_error($conn));
+    }
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_bind_result($stmt, $equipe_id, $equipe_name);
+    $teams = [];
+    while (mysqli_stmt_fetch($stmt)) {
+        $teams[$equipe_id] = $equipe_name;
+    }
+
+    mysqli_stmt_close($stmt);
+    echo "<main class='w-[100%] h-[100%] flex items-center justify-center bg-slate-300'>
+    <form action='assign.php' method='post' class='bg-[#1f2937] relative w-[50%] px-15 py-20 z-10 rounded-xl flex flex-col items-center gap-5'>
+        <input type='text' name='project'  class='w-[60%] rounded-xl' placeholder='enter your new project name:'>
+        <input type='text' name='projectdesc'  class='w-[60%] rounded-xl' placeholder='enter project description'>
+        <select name='projectteam' class='w-[60%] rounded-xl'>
+        <option class='w-[60%] rounded-xl' selected disabled hidden >Assign a new team</option>";
+
+    foreach ($teams as $id => $name) {
+        echo "<option class='w-[60%] rounded-xl' value='$id'>$name</option>";
     }
 
     echo "</select>
-        <input type='submit' name='submit' value='Done'>
-    </form>";
-   
-    if(isset($_GET['projectname'])&&isset($_GET['scrummaster'])){
-    $projectname = $_GET['projectname'];
-    }if(isset($_GET['scrummaster'])){
-        $scrummaster = $_GET['scrummaster'];
+        <input type='submit' name='submit'  class='text-white cursor-pointer' value='Done'>
+        <input type='submit' name='back'  class='text-white cursor-pointer' value='Back to main page'>
+    </form> </main>";
+    if (isset($_POST['submit'])) {
+        $projectdesc = $_POST['projectdesc'];
+        $projectname=$_POST['project'];
+        $projectteam=$_POST['projectteam'];
+        $sql2 = "UPDATE projects SET project_name=? , project_description = ? , equipe_id = ? WHERE productowner_id=? ";
+        $stmt2 = mysqli_prepare($conn, $sql2);
+        
+        if (!$stmt2) {
+            die("Error preparing statement: " . mysqli_error($conn));
         }
-    
-    $sql = " UPDATE projects SET project_name= $projectname WHERE project_id= $project_id";
-    mysqli_query($conn, $sql);
-    mysqli_close($conn);
-    header('location:productowner.php');
-}
 
+        mysqli_stmt_bind_param($stmt2, "siii", $projectname, $projectdesc, $projectteam, $productowner);
 
-
-if ($_SESSION['type'] === "assignscrum") {
-    if ($_SESSION['type'] === "assignscrum") {
-        $prjid = $_SESSION['project'];
-        $id = $_GET['idscrm'];
-        $stmt = mysqli_prepare($conn, "UPDATE users SET project_id=?, status='active' WHERE user_id=?");
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "ii", $prjid, $id);
-            mysqli_stmt_execute($stmt);
-            mysqli_stmt_close($stmt);
-            mysqli_close($conn);
-            header('location: productowner.php');
-            exit();
+        if (mysqli_stmt_execute($stmt2)) {
+            echo "Team name updated successfully.";
+        } else {
+            echo "Error updating team name: " . mysqli_error($conn);
         }
+
+        mysqli_stmt_close($stmt2);
+        header('location:productowner.php');
+    }
+         
+    if(isset($_POST['back'])){
+        header('location:productowner.php');
+        exit();
     }
 }
 
