@@ -16,7 +16,7 @@ if ($_SESSION['type'] === 'productowner') {
     $managerid = $_SESSION['projectmanagerid'];
     $sql = "DELETE FROM projects WHERE project_id = $project_id ";
     mysqli_query($conn, $sql);
-    $sqluser = "UPDATE users SET user_role = 'member', status = 'not active' WHERE user_id = ?";
+    $sqluser = "UPDATE users SET user_role = 'member', user_status = 'not active' , project_id = null WHERE user_id = ?";
     $stmtuser = mysqli_prepare($conn, $sqluser);
     mysqli_stmt_bind_param($stmtuser, "i", $managerid);
     mysqli_stmt_execute($stmtuser);

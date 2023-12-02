@@ -1,6 +1,7 @@
 <?php
 session_start();
 include("databaseconn.php");
+error_reporting(0);
 if (!isset($_SESSION['id'])) {
   header('location:login.php');
   exit();
@@ -62,36 +63,13 @@ if (!isset($_SESSION['id'])) {
     </div>
   </div>
   <br>
-
-
-  <div class="relative  shadow-md sm:rounded-lg">
-  <table>
-    <thead>
-        <tr class="bg-white border-b text-base dark:bg-gray-800 dark:border-gray-700">
-            <th scope="col" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
+      <?php
             if (isset($_POST['members']) ) {
-              echo "Members";
               $choice = 'members';
             }if(isset($_POST['stats'])){
               $choice = 'stats';
-            } ?></th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
-            if (isset($_POST['members']) || $choice === 'members') {
-              echo "Role";
-            } ?></th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
-            if (isset($_POST['members']) || $choice === 'members') {
-              echo "Member Status";
-
-            } ?></th>
-            <th scope="col" class="px-4 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white"><?php
-            if (isset($_POST['members']) || $choice === 'members') {
-              echo "Assign as Product Owner";
-
-            } ?></th>
-        </tr>
-    </thead>
-    <tbody class="ml-3 w-[80%]">
+            } ?>
+  
         <?php
         if($choice === 'members'){
         $sql = 'SELECT user_id, user_fullname, user_role, user_status FROM users WHERE user_role!="admin"';
@@ -99,22 +77,42 @@ if (!isset($_SESSION['id'])) {
         mysqli_stmt_execute($stmt);
         mysqli_stmt_bind_result($stmt, $user_id,$user_fullname, $user_role,$status);
         $_SESSION['type']='adm';
+          echo "<section class='h-[100vh] flex flex-wrap'>";
         while (mysqli_stmt_fetch($stmt)) {
-            echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                    <td class='px-6 py-4'>$user_fullname</td>
-                    <td class='px-4 py-4'>$user_role</td>
-                    <td class='px-4 py-4'>$status</td>
-                    <td class='px-4 py-4'>
-                        <a href='assign.php?id=$user_id'>Assign as Product owner</a>
-                    </td>
-                    <td class='px-2 py-4'>
-                        <a href='delete.php?id=$user_id'>Delete</a>
-                    </td>
-                </tr>";
-        }
+          echo "
+          <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+              <ul role='list' class='flex flex-col items-center'>
+                  <li class='col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200'>
+                      <div class='flex-1 flex flex-col p-8'>
+                          <h3 class='mt-6 text-gray-900 text-sm font-medium'>$user_fullname</h3>
+                          <dl class='mt-1 flex-grow flex flex-col justify-between'>
+                              <dd class='text-gray-500 text-sm'>$status</dd>
+                              <dd class='mt-3'>
+                                  <span class='px-2 py-1 text-green-800 text-xs font-medium bg-green-100 rounded-full'>$user_role</span>
+                              </dd>
+                          </dl>
+                      </div>
+                      <div class='-mt-px flex flex-col'>
+                          <div class='w-[100%] flex-1 flex items-center bg-green-200'>
+                              <a href='assign.php?id=$user_id'>Assign as Product owner</a>
+                          </div>
+                          <div class='-ml-px w-[100%] flex-1 flex justify-center bg-red-200'>
+                              <a href='delete.php?id=$user_id'>Delete</a>
+                          </div>
+                      </div>
+                  </li>
+              </ul>
+          </div>";
+      }
+      echo "</section>";
 
         mysqli_stmt_close($stmt);
       }
+
+
+      ?>
+      <?php
+     
       if ($choice === 'stats') {
         $sql = "SELECT COUNT(*) FROM users";
         $stmt = mysqli_prepare($conn, $sql);
@@ -155,10 +153,7 @@ if (!isset($_SESSION['id'])) {
             </div>";
     }
 ?>    
-      
-    </tbody>
-</table>
-  </div>
+  
 
 
 

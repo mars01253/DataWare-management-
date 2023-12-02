@@ -55,10 +55,11 @@ if (!isset($_SESSION['id'])) {
     </div>
     </div>
   </nav>
-  <section class=" bg-blue-50 w-[100vw] h-[90vh] absolute z-9 flex flex-col items-center justify-center hidden" id="projectpopup">
+  <section class=" bg-blue-50 w-[100vw] h-[100vh] absolute z-9 flex flex-col items-center justify-center hidden" id="projectpopup">
     <form action="productowner.php" method="get" class="bg-[#1f2937] relative w-[50%] px-15 py-20 z-10 rounded-xl flex flex-col items-center gap-5">
       <img src="img/close.svg" alt="..." class=" w-[6%] float-right mr-3 relative top-3 right-20 " id="closeform2">
       <input type="text" placeholder="project name" name="projectname" class="w-[60%] rounded-xl">
+      <input type="text" placeholder="project description" name="projectdesc" class="w-[60%] rounded-xl">
       <select name="managers" id="managers" class="w-[60%] rounded-xl">
         <option value="choose your project manager" disabled selected hidden>choose your project manager</option>
         <?php
@@ -79,12 +80,13 @@ if (!isset($_SESSION['id'])) {
       if (!empty($_GET['projectname']) && !empty($_GET['submitproject']) && !empty($_GET['managers'])) {
         $name = $_GET['projectname'];
         $sub = $_GET['submitproject'];
+        $projectdesc= $_GET['projectdesc'];
         $managerid = $_GET['managers'];
         $projectownerid = $_SESSION['id'];
 
-        $sql = 'INSERT INTO projects (project_name, productowner_id, scrum_master_id) VALUES (?, ?, ?)';
+        $sql = 'INSERT INTO projects (project_name, project_description ,scrum_master_id,productowner_id ) VALUES (?, ?, ?,?)';
         $stmt = mysqli_prepare($conn, $sql);
-        mysqli_stmt_bind_param($stmt, "sii", $name, $projectownerid, $managerid);
+        mysqli_stmt_bind_param($stmt, "ssii", $name, $projectdesc,$managerid,$projectownerid );
 
         $result = mysqli_stmt_execute($stmt);
 
@@ -98,8 +100,6 @@ if (!isset($_SESSION['id'])) {
           $_SESSION['projectmanagerid'] = $managerid;
           if ($updateresult) {
             echo 'Project added successfully, and user status updated.';
-          } else {
-            echo 'Project added successfully, but failed to update user status.';
           }
 
           mysqli_stmt_close($updatestmt);
@@ -146,30 +146,13 @@ if (!isset($_SESSION['id'])) {
   </div>
 
 
-  <div class="relative  shadow-md sm:rounded-lg">
-    <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
-        <tr>
-          <thead>
-            <tr>
-              <th scope="col" class="px-4 py-3">
-                PROJECTS
-              </th>
-              <th scope="col" class="px-4 py-3">
-                PROJECT STATUS
-              </th>
-              <th scope="col" class="px-4 py-3">
-                PROJECT MANAGER
-              </th>
-            </tr>
-          </thead>
-      <tbody>
+  <div class="relative shadow-md sm:rounded-lg">
         <?php
         if (isset($_SESSION['id'])) {
           $productowner = $_SESSION['id'];
           $_SESSION['type'] = 'productowner';
 
-          $sql = "SELECT projects.project_id, projects.project_name, projects.project_status, users.user_fullname
+          $sql = "SELECT projects.project_id, projects.project_name,projects.project_status,projects.project_description , users.user_fullname
             FROM projects
             INNER JOIN users ON users.user_id = projects.scrum_master_id
             WHERE projects.productowner_id=? AND users.user_role='scrum master'";
@@ -179,29 +162,47 @@ if (!isset($_SESSION['id'])) {
           if ($stmt) {
             mysqli_stmt_bind_param($stmt, "i", $productowner);
             mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $project_id, $project_name, $project_status, $user_fullname);
-
+            mysqli_stmt_bind_result($stmt, $project_id, $project_name, $project_status,$projectdesc, $user_fullname);
+            echo "<section class='h-[100vh] flex flex-wrap'>";
             while (mysqli_stmt_fetch($stmt)) {
-              echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                    <td class='px-6 py-4'>$project_name</td>
-                    <td class='px-4 py-4'>$project_status</td>
-                    <td class='px-4 py-4'>$user_fullname</td>
-                    <td class='px-4 py-4'>
-                        <a href='assign.php?idprj=$project_id'>edit</a>
-                    </td>
-                    <td class='px-2 py-4'>
-                        <a href='delete.php?idprj=$project_id'>Delete</a>
-                    </td>
-                </tr>";
+              echo "
+                <div class='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+                <ul role='list' class='flex flex-col items-center'>
+                    <li class='col-span-1 flex flex-col text-center bg-white rounded-lg shadow divide-y divide-gray-200'>
+                        <div class='flex-1 flex flex-col p-8'>
+                           <h2 class='mt-6 text-gray-900 text-sm font-medium'>project name</h2>
+                           <dd class='text-gray-500 text-sm'>$project_name</dd>
+                            <dl class='mt-1 flex-grow flex flex-col justify-between'>
+                            <h2 class='mt-6 text-gray-900 text-sm font-medium'>project status</h2>
+                                <dd class='text-gray-500 text-sm'>$project_status</dd>
+                                <h2 class='mt-6 text-gray-900 text-sm font-medium'>project description</h2>
+                                <dd class='mt-3'>
+                                    <span class='px-2 py-1 text-green-800 text-xs font-medium bg-green-100 rounded-full'>$projectdesc</span>
+                                </dd>
+                                <h2 class='mt-6 text-gray-900 text-sm font-medium'>project Manager</h2>
+                                <dd class='text-gray-500 text-sm'>$user_fullname</dd>
+                            </dl>
+                        </div>
+                        <div class='-mt-px flex flex-col'>
+                            <div class='w-[100%] flex-1 flex justify-center bg-green-200'>
+                            <a href='assign.php?idprj=$project_id'>edit</a>
+                            </div>
+                            <div class='-ml-px w-[100%] flex-1 flex justify-center bg-red-200'>
+                            <a href='delete.php?idprj=$project_id'>Delete</a>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>";
             }
+            echo "</section>";
             $_SESSION['id']= $productowner;
             mysqli_stmt_close($stmt);
           }
         }
         ?>
 
-      </tbody>
-    </table>
+      
   </div>
 
 
