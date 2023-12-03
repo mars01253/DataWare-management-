@@ -25,8 +25,7 @@ if (!isset($_SESSION['id'])) {
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center w-[100%] justify-between">
           <div class="flex-shrink-0">
-            <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-            <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+          <h1 class="text-white">DataWare</h1>
           </div>
           <div class="hidden sm:block sm:ml-6">
             <div class="flex space-x-4 ml-50 ">
@@ -107,7 +106,7 @@ if (!isset($_SESSION['id'])) {
         $id = $_SESSION['id'];
 
         if ($choice === 'teams') {
-          $sql = "SELECT users.equipe_id, users.project_id, projects.project_status, projects.project_name, projects.project_description, equipe.equipe_name
+          $sql = " SELECT  users.project_id, projects.project_name, projects.project_status, projects.project_description,   users.equipe_id, equipe.equipe_name
                FROM users
                INNER JOIN projects ON users.project_id = projects.project_id 
                INNER JOIN equipe ON users.equipe_id = equipe.equipe_id
@@ -118,13 +117,14 @@ if (!isset($_SESSION['id'])) {
           if ($stmt) {
             mysqli_stmt_bind_param($stmt, "i", $id);
             mysqli_stmt_execute($stmt);
-            mysqli_stmt_bind_result($stmt, $equipe_id, $project_id, $project_status, $projectdescription ,$project_name, $equipe_name);
+            mysqli_stmt_bind_result($stmt, $project_id,$project_name,$project_status, $projectdescription,$equipe_id, $equipe_name);
+
 
             while (mysqli_stmt_fetch($stmt)) {
               echo "<tr class='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
                    <td class='px-6 py-4'>$project_name</td>
-                   <td class='px-6 py-4'>$projectdescription</td>
-                   <td class='px-4 py-4'>$project_status</td>
+                   <td class='px-6 py-4'>$project_status</td>
+                   <td class='px-4 py-4'>$projectdescription</td>
                    <td class='px-4 py-4'>$equipe_name</td>
                  </tr>";
             }

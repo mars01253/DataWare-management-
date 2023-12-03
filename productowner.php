@@ -25,8 +25,7 @@ if (!isset($_SESSION['id'])) {
       <div class="flex items-center justify-between h-16 ">
         <div class="flex items-center w-[100%] justify-between ">
           <div class="flex-shrink-0">
-            <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-            <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+            <h1 class="text-white" >DataWare</h1>
           </div>
           <div class="hidden sm:block sm:ml-6 w-1/">
             <div class="flex space-x-4 ml-50 ">
@@ -84,12 +83,12 @@ if (!isset($_SESSION['id'])) {
         $managerid = $_GET['managers'];
         $projectownerid = $_SESSION['id'];
 
-        $sql = 'INSERT INTO projects (project_name, project_description ,scrum_master_id,productowner_id ) VALUES (?, ?, ?,?)';
+        $sql = 'INSERT INTO projects  (project_name, project_description ,scrum_master_id,productowner_id ) VALUES (?, ?, ?,?)';
         $stmt = mysqli_prepare($conn, $sql);
         mysqli_stmt_bind_param($stmt, "ssii", $name, $projectdesc,$managerid,$projectownerid );
 
         $result = mysqli_stmt_execute($stmt);
-
+        
         if ($result) {
           $prjid = mysqli_insert_id($conn);
 
@@ -97,6 +96,9 @@ if (!isset($_SESSION['id'])) {
           $updatestmt = mysqli_prepare($conn, $updatesql);
           mysqli_stmt_bind_param($updatestmt, "ii", $prjid, $managerid);
           $updateresult = mysqli_stmt_execute($updatestmt);
+          $sql2=" UPDATE users set user_status='active' , project_id = $prjid WHERE user_id = $projectownerid ";
+          mysqli_query($conn , $sql2);
+          
           $_SESSION['projectmanagerid'] = $managerid;
           if ($updateresult) {
             echo 'Project added successfully, and user status updated.';

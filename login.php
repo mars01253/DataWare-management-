@@ -4,6 +4,7 @@ session_start();
 // if(isset($_SESSION['id'])){
 //   header('location:login.php');
 // }
+ $unable=false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,6 +46,7 @@ session_start();
 
         <div>
           <input type="submit" value="Log In" name="login" class="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+          <?php if($unable){echo '<h3>Unable to log in</h3>';} ?>
         </div>
       </form>
 
@@ -68,6 +70,7 @@ session_start();
 
 <?php
 if (isset($_POST['login'])) {
+ 
   $email = $_POST['email'];
   $password = $_POST['password'];
   $validemail = '/^(([a-zA-Z]{1,})\d{1,}@[a-z]{1,}\.[a-z]{1,3}|[a-z]+@[a-z]+\.[a-z]{1,3})$/';
@@ -95,7 +98,7 @@ if (isset($_POST['login'])) {
         header('location:productowner.php');
       }
     } else {
-      echo "Unable to log in ";
+      $unable = true;
     }
   }
 }

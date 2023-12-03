@@ -26,7 +26,7 @@ if (!isset($_SESSION['id'])) {
       <div class="flex items-center justify-between h-16">
         <div class="flex items-center w-[100%] justify-between">
           <div class="w-[10%]">
-            <img class="block lg:block " src="img/White and Black Elegant System Logo.png" alt="Workflow">
+            <h1 class="text-white">DataWare</h1>
           </div>
           <div class="flex flex-col sm:block sm:ml-6">
             <div class="flex space-x-4 ml-50 ">

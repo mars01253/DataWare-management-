@@ -25,8 +25,7 @@ if (!isset($_SESSION['id'])) {
       <div class="flex items-center justify-between h-16 ">
         <div class="flex items-center w-[100%] justify-between ">
           <div class="flex-shrink-0">
-            <img class="block lg:hidden h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow">
-            <img class="hidden lg:block h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-logo-indigo-500-mark-white-text.svg" alt="Workflow">
+            <h1 class="text-white">DataWare</h1>
           </div>
           <div class="hidden sm:block sm:ml-6 w-1/">
             <div class="flex space-x-4 ml-50 ">
